@@ -1,0 +1,7 @@
+node_modules
+dist
+coverage
+package-lock.json
+backend/src/database/migrations
+backend/uploads
+.pglite-data

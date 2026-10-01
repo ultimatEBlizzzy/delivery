@@ -1,0 +1,14 @@
+**/node_modules
+**/dist
+**/coverage
+**/.vite
+.git
+.github
+.env
+.env.*
+!.env.example
+uploads
+.pglite-data
+docs
+*.md
+!README.md

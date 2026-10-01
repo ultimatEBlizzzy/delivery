@@ -1,0 +1,35 @@
+# dependencies
+node_modules/
+.pnp.*
+
+# builds
+dist/
+build/
+coverage/
+*.tsbuildinfo
+.vite/
+.turbo/
+
+# environment & secrets (never commit)
+.env
+.env.*
+!.env.example
+
+# runtime data
+uploads/
+backend/uploads/
+.pglite-data/
+*.log
+logs/
+pids/
+
+# editors / OS
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+
+# test output
+test-results/
+playwright-report/

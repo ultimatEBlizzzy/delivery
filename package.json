@@ -1,0 +1,43 @@
+{
+  "name": "hardware-delivery",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Hardware e-hailing & delivery marketplace for South Africa (customers, hardware stores, drivers, admin).",
+  "license": "UNLICENSED",
+  "workspaces": [
+    "shared",
+    "backend",
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "build:shared": "npm run build -w @hardware-delivery/shared",
+    "build": "npm run build:shared && npm run build -w @hardware-delivery/backend && npm run build -w @hardware-delivery/frontend",
+    "dev": "npm run build:shared && concurrently -k -n shared,api,web -c gray,cyan,magenta \"npm run dev -w @hardware-delivery/shared\" \"npm run start:dev -w @hardware-delivery/backend\" \"npm run dev -w @hardware-delivery/frontend\"",
+    "dev:api": "npm run build:shared && npm run start:dev -w @hardware-delivery/backend",
+    "dev:web": "npm run build:shared && npm run dev -w @hardware-delivery/frontend",
+    "typecheck": "npm run build:shared && npm run typecheck -w @hardware-delivery/backend && npm run typecheck -w @hardware-delivery/frontend",
+    "lint": "eslint .",
+    "format": "prettier --write \"{shared,backend,frontend}/**/*.{ts,tsx,json,css}\" --ignore-path .gitignore",
+    "test": "npm run build:shared && npm run test -w @hardware-delivery/backend && npm run test -w @hardware-delivery/frontend",
+    "test:e2e": "npm run build:shared && npm run test:e2e -w @hardware-delivery/backend",
+    "db:up": "docker compose up -d db",
+    "db:down": "docker compose down",
+    "db:embedded": "npm run db:embedded -w @hardware-delivery/backend",
+    "db:migrate": "npm run build:shared && npm run migration:run -w @hardware-delivery/backend",
+    "db:seed": "npm run build:shared && npm run db:seed -w @hardware-delivery/backend",
+    "db:reset": "npm run build:shared && npm run db:reset -w @hardware-delivery/backend"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.0",
+    "concurrently": "^9.2.1",
+    "eslint": "^10.11.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^16.0.0",
+    "prettier": "^3.6.0",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.71.0"
+  }
+}
