@@ -60,9 +60,6 @@ export default async function globalSetup(): Promise<void> {
     wipe = true;
   } else {
     url = await startEmbeddedDatabase();
-    // The embedded database is ONE session shared by every connection, so connections must not be
-    // pooled in parallel (their protocol messages would interleave). Real PostgreSQL has no such limit.
-    process.env.DATABASE_POOL_MAX ??= '1';
   }
 
   const dataSource = createDataSource({ url, poolMax: 2 });
