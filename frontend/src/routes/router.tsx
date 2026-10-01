@@ -8,7 +8,7 @@ import { Toaster } from '@/components/ui/Toaster';
 import { adminNav } from '@/features/admin/nav';
 import { RequireRole } from '@/features/auth/RequireRole';
 import { driverNav } from '@/features/driver/nav';
-import { storeNav } from '@/features/store/nav';
+import { StoreLayout } from '@/features/store/StoreLayout';
 import { RouteError } from './RouteError';
 
 /** Code-split a page: its chunk is only downloaded when the route is first visited. */
@@ -29,9 +29,6 @@ function RootLayout() {
 
 const AdminLayout = () => (
   <PortalLayout portal={Role.ADMIN} label="Admin" nav={adminNav} profilePath="/admin/profile" />
-);
-const StoreLayout = () => (
-  <PortalLayout portal={Role.STORE} label="Store" nav={storeNav} profilePath="/store/profile" />
 );
 const DriverLayout = () => (
   <PortalLayout portal={Role.DRIVER} label="Driver" nav={driverNav} profilePath="/driver/profile" />
@@ -106,7 +103,14 @@ export const router = createBrowserRouter([
           {
             element: <StoreLayout />,
             children: [
-              { index: true, element: <Navigate to="/store/profile" replace /> },
+              { index: true, lazy: page(() => import('@/features/store/StoreDashboardPage')) },
+              { path: 'products', lazy: page(() => import('@/features/store/StoreProductsPage')) },
+              {
+                path: 'inventory',
+                lazy: page(() => import('@/features/store/StoreInventoryPage')),
+              },
+              { path: 'staff', lazy: page(() => import('@/features/store/StoreStaffPage')) },
+              { path: 'settings', lazy: page(() => import('@/features/store/StoreSettingsPage')) },
               { path: 'profile', lazy: profileFor(Role.STORE) },
             ],
           },
@@ -125,7 +129,16 @@ export const router = createBrowserRouter([
           {
             element: <AdminLayout />,
             children: [
-              { index: true, element: <Navigate to="/admin/settings" replace /> },
+              { index: true, element: <Navigate to="/admin/stores" replace /> },
+              { path: 'stores', lazy: page(() => import('@/features/stores/AdminStoresPage')) },
+              {
+                path: 'stores/:storeId',
+                lazy: page(() => import('@/features/stores/AdminStoreDetailPage')),
+              },
+              { path: 'store-staff', lazy: page(() => import('@/features/admin/StoreStaffPage')) },
+              { path: 'categories', lazy: page(() => import('@/features/admin/CategoriesPage')) },
+              { path: 'products', lazy: page(() => import('@/features/admin/ProductsPage')) },
+              { path: 'inventory', lazy: page(() => import('@/features/admin/InventoryPage')) },
               { path: 'settings', lazy: page(() => import('@/features/admin/SettingsPage')) },
               { path: 'audit-log', lazy: page(() => import('@/features/admin/AuditLogPage')) },
               { path: 'profile', lazy: profileFor(Role.ADMIN) },

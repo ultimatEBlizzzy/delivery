@@ -22,7 +22,13 @@ export function PageHeader({
     <div className={cn('mb-6 flex flex-wrap items-end justify-between gap-4', className)}>
       <div className="min-w-0">
         {eyebrow && (
-          <div className="mb-1 text-xs font-semibold uppercase tracking-wide text-brand-700">
+          <div
+            className={cn(
+              'mb-1.5',
+              typeof eyebrow === 'string' &&
+                'text-xs font-semibold uppercase tracking-wide text-brand-700',
+            )}
+          >
             {eyebrow}
           </div>
         )}

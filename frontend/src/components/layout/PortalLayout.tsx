@@ -73,6 +73,7 @@ export function PortalLayout({
   profilePath,
   topbarExtra,
   sidebarFooter,
+  banner,
 }: {
   portal: Role;
   label: string;
@@ -80,6 +81,8 @@ export function PortalLayout({
   profilePath: string;
   topbarExtra?: ReactNode;
   sidebarFooter?: ReactNode;
+  /** Full-width notice above the page content (e.g. "store awaiting approval"). */
+  banner?: ReactNode;
 }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -166,6 +169,7 @@ export function PortalLayout({
         tabIndex={-1}
         className="mx-auto w-full max-w-[1400px] p-4 outline-none sm:p-6 lg:p-8"
       >
+        {banner && <div className="mb-6">{banner}</div>}
         <Outlet />
       </main>
     </div>

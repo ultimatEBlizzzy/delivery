@@ -35,7 +35,7 @@ Pick **one** way to get PostgreSQL + PostGIS:
 ```bash
 npm run db:up                 # docker compose up -d db   (postgis/postgis, port 5432)
 npm run db:migrate            # create the schema
-npm run admin:create -w @hardware-delivery/backend -- --email you@example.com --password 'S3cure-Passw0rd'
+npm run db:seed               # demo data: 5 stores, 79 products, 250 store listings (optional)
 npm run dev                   # API :3000 + web :5173 with hot reload
 ```
 
@@ -47,11 +47,17 @@ for laptops without Docker and for CI smoke tests; use the Docker image for anyt
 ```bash
 npm run db:embedded           # leave running in its own terminal – prints the DATABASE_URL to use
 # put that URL in .env →  DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54329/postgres
-npm run db:migrate
+npm run db:migrate && npm run db:seed
 npm run dev
 ```
 
 (~1 GB RAM. Data lives in `.pglite-data/`; delete the folder for a clean slate or pass `--memory`.)
+
+> **How the embedded database works.** PGlite is a *single* PostgreSQL session, so `scripts/embedded-db.mjs`
+> ships its own wire-protocol server: it forwards whole query cycles, serialises transactions from different
+> connections, repairs PGlite's duplicate `ReadyForQuery` after errors and rolls back abandoned transactions.
+> Consequently transactions from different connections run one after another (real PostgreSQL runs them in
+> parallel with row locks) – the Docker database remains the reference for production and CI.
 
 ### C. Everything in Docker
 
@@ -81,6 +87,24 @@ Open **http://localhost:5173** (npm dev) or **http://localhost:8080** (Docker).
 ├── docs/               Architecture notes
 └── .env.example        Every environment variable, documented
 ```
+
+## Demo data & accounts
+
+`npm run db:seed` (or `npm run db:reset` to wipe first) creates a fictional marketplace through the real services,
+so every business rule is exercised: 28 categories (8 top-level), 79 products with weights and dimensions, five
+stores that price and stock the *same* products differently, generated SVG product art, store owners and staff.
+It refuses to run with `NODE_ENV=production` unless `--force` is given. **All e-mails end in `.test`; the password
+for every demo account is `Demo@1234`.**
+
+| Role | Sign in at | Account |
+| --- | --- | --- |
+| Admin | `/admin/login` | `admin@demo.test` |
+| Store owners | `/store/login` | `owner.malamulele@demo.test`, `owner.polokwane@demo.test`, `owner.limpopo@demo.test`, `owner.township@demo.test`, `owner.probuild@demo.test` |
+| Store manager / staff | `/store/login` | `manager.malamulele@demo.test`, `staff.malamulele@demo.test`, `manager.polokwane@demo.test` |
+
+Store names come from the product brief; brands, people and addresses are invented.
+
+For a real deployment create the first administrator instead: `npm run admin:create -w @hardware-delivery/backend -- --email … --password …`.
 
 ## Tech stack
 
@@ -160,7 +184,10 @@ Compose database creates `hardware_delivery_test` for you). CI does exactly that
 - [x] **Phase 1 – Foundation:** monorepo, shared package, config, PostgreSQL/PostGIS + migrations, auth
       (register/login/refresh/logout), RBAC, audit log, platform settings, Docker, CI, frontend shell,
       sign-in pages for all four roles, admin settings & audit-log screens.
-- [ ] Phase 2 – Core data model: stores, categories, products, store listings, inventory
+- [x] **Phase 2 – Core data model:** stores (PostGIS), staff roles with tenant isolation, category tree, global products
+      vs store-specific listings (own price / sale price / stock / order limits), inventory ledger with row locking, storage
+      + maps provider abstractions, seed data; admin screens (stores, staff, categories, products, inventory) and the
+      store portal (dashboard, products, inventory, staff, settings).
 - [ ] Phase 3 – Customer experience: browse, cart, checkout
 - [ ] Phase 4 – Orders, pricing & mock payments
 - [ ] Phase 5 – Drivers & vehicles
